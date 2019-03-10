@@ -50,3 +50,24 @@ def Johnson3maszynowy(Maszyna1, Maszyna2, Maszyna3):
 
     Kolejnosc = Johnson2maszynowy(wirtualnaMaszyna1, wirtualnaMaszyna2)
     return Kolejnosc
+
+def sortowanie(M1,M2,M3):
+    if M3!=0:
+        tab=Johnson3maszynowy(M1,M2,M3)
+        print (tab)
+        tmp1=[]
+        tmp2=[]
+        tmp3=[]
+        for i in range(len(tab)):
+            tmp1.append(M1[tab[i]-1])
+            tmp2.append(M2[tab[i]-1])
+            tmp3.append(M3[tab[i]-1])
+    else:
+        tab = Johnson2maszynowy(M1, M2)
+        tmp1 = []
+        tmp2 = []
+        tmp3 = 0
+        for i in range(len(tab)):
+            tmp1.append(M1[tab[i] - 1])
+            tmp2.append(M2[tab[i] - 1])
+    return tmp1,tmp2,tmp3
