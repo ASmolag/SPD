@@ -2,6 +2,7 @@ from Johnson import Johnson3maszynowy
 from Johnson import Johnson2maszynowy
 from Johnson import sortowanie
 import time
+
 #Wczytanie pliku
 def wczytaj_plik(nazwa_pliku):
     plik=open(nazwa_pliku)
@@ -10,15 +11,10 @@ def wczytaj_plik(nazwa_pliku):
     finally:
         plik.close()
     return tekst
+
 #Obróbka danych do postaci tablicy int-ów
 def dane_do_tab(tekst):
-    i=0
-    data=[]
-    while i < len(tekst):
-        data.append(tekst[i])
-        i+=2
-    dane=list(map(int, data))
-    return dane
+    return list(map(int, tekst.split()))
 
 #Rozpisanie zadań na odpowiednie maszyny
 def rozpisanie_zadan(dane):
@@ -26,7 +22,7 @@ def rozpisanie_zadan(dane):
     M1=[]
     M2=[]
     M3=[]
-    while i<(dane[0]*dane[1]):
+    while i<(dane[0]*dane[1]+2):
         if dane[1]==2:
             M1.append(dane[i])
             M2.append(dane[i+1])
@@ -36,7 +32,8 @@ def rozpisanie_zadan(dane):
             M2.append(dane[i+1])
             M3.append(dane[i+2])
         i+=dane[1]
-    return M1,M2,M3,dane
+    return M1,M2,M3
+
 #stworzenie harmonogramu
 def harmonogram(M1,M2):
     s=M1[0]+M1[1]
@@ -51,7 +48,7 @@ def harmonogram(M1,M2):
     return s2
 
 def harmonogram3(M1,M2,M3):
-    s=M1[0]+M1[0]
+    s=M1[0]+M1[1]
     s2=M1[0]+M2[0]
     s3=M1[0]+M2[0]+M3[0]
     for i in range(1,len(M1)):
@@ -66,19 +63,24 @@ def harmonogram3(M1,M2,M3):
         if i!=len(M1)-1:
             s+=M1[i+1]
     return s3
-t0 = time.time()
-M1,M2,M3,dane=rozpisanie_zadan(dane_do_tab(wczytaj_plik('data.txt')))
-#Obliczenie odpowiedniej kolejności
-#if dane[1]==2:
- #   print(Johnson2maszynowy(M1,M2))
-#else:
-  #  print(Johnson3maszynowy(M1, M2, M3))
-print(M1,M2,M3)
-tmp1,tmp2,tmp3=sortowanie(M1,M2,M3)
-print(harmonogram3(tmp1,tmp2,tmp3))
 
-t1 = time.time()
+M1,M2,M3=rozpisanie_zadan(dane_do_tab(wczytaj_plik('data.txt')))
+
+if M3==0:
+    t0 = time.time()
+    kolejnosc=Johnson2maszynowy(M1,M2)
+    t1 = time.time()
+else:
+    t0 = time.time()
+    kolejnosc=Johnson3maszynowy(M1,M2,M3)
+    t1 = time.time()
+
+tmp1,tmp2,tmp3=sortowanie(M1,M2,M3,kolejnosc)
 total = t1-t0
 
-print('czas wykonywania przegladu zupelnego:{} '.format(total))
+print("Wprowadzone dane to:")
+print(M1,M2,M3)
+print("Optymalna kolejność dla tego zestawu danych: {}".format(kolejnosc))
+print('Total makespan = {}'.format(harmonogram3(tmp1,tmp2,tmp3)))
 
+print('Czas wykonywania dla algorytmu Johnsona:{} '.format(total))
