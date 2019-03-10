@@ -1,9 +1,12 @@
 import itertools
 from main import wczytaj_plik, dane_do_tab, rozpisanie_zadan, harmonogram3, harmonogram
+import time
 #tablice testowe
 tab1=[5,4,4,1,3]
 tab2=[2,6,3,5,4]
 
+
+t0 = time.time()
 M1,M2,M3,dane=rozpisanie_zadan(dane_do_tab(wczytaj_plik('data.txt')))
 #harmonogram(M1,M2,M3)
 if M3!=0:
@@ -42,3 +45,7 @@ else:
         print(suma2)
     print(sums)
     print(min2, a)
+
+t1 = time.time()
+total = t1-t0
+print('czas wykonywania przegladu zupelnego:{} '.format(total))

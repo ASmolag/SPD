@@ -1,7 +1,7 @@
 from Johnson import Johnson3maszynowy
 from Johnson import Johnson2maszynowy
 from Johnson import sortowanie
-
+import time
 #Wczytanie pliku
 def wczytaj_plik(nazwa_pliku):
     plik=open(nazwa_pliku)
@@ -66,7 +66,7 @@ def harmonogram3(M1,M2,M3):
         if i!=len(M1)-1:
             s+=M1[i+1]
     return s3
-
+t0 = time.time()
 M1,M2,M3,dane=rozpisanie_zadan(dane_do_tab(wczytaj_plik('data.txt')))
 #Obliczenie odpowiedniej kolejności
 #if dane[1]==2:
@@ -77,5 +77,8 @@ print(M1,M2,M3)
 tmp1,tmp2,tmp3=sortowanie(M1,M2,M3)
 print(harmonogram3(tmp1,tmp2,tmp3))
 
+t1 = time.time()
+total = t1-t0
 
+print('czas wykonywania przegladu zupelnego:{} '.format(total))
 
