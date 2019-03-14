@@ -9,8 +9,8 @@ def ZnajdzNajkrotszeZadanie (M) :
 
 
 def Johnson2maszynowy (M1, M2) :
-    Maszyna1 = M1
-    Maszyna2 = M2
+    Maszyna1 = M1[:]
+    Maszyna2 = M2[:]
     L1=[]
     L2=[]
     najdluzszy=99999

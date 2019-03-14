@@ -25,8 +25,9 @@ def przeglad_zupelny(M1,M2,M3):
     else:
         tablica1 = list(itertools.permutations(M1))
         tablica2 = list(itertools.permutations(M2))
+        tablica3 = 0
         for i in range(len(tablica1)):
-            suma = harmonogram(tablica1[i], tablica2[i])
+            suma = harmonogram(tablica1[i], tablica2[i], tablica3)
             if suma < min:
                 min=suma
                 indeks = i

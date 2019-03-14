@@ -3,8 +3,8 @@ from przeglad import przeglad_zupelny
 from pomoc import wczytaj_plik, generowaniePrzebiegowLosowych, rozpisanie_zadan, harmonogram, sortowanie
 import time
 
-#dane = wczytaj_plik('data.txt')
-dane = generowaniePrzebiegowLosowych(4,3)
+dane = wczytaj_plik('data.txt')
+#dane = generowaniePrzebiegowLosowych(7,2)
 
 M1,M2,M3=rozpisanie_zadan(dane)
 
@@ -25,12 +25,18 @@ tmp1,tmp2,tmp3=sortowanie(M1,M2,M3,kolejnosc)
 
 
 print("Wprowadzone dane to:")
-print(M1,M2,M3)
+if M3!=0:
+    print(M1,M2,M3)
+else:
+    print(M1,M2)
 
 print('Rezultaty algorytmu Johnsona:')
 print("Optymalna kolejność dla tego zestawu danych: {}".format(kolejnosc))
 print('Realizowana przez ustawienie:')
-print(tmp1,tmp2,tmp3)
+if M3!=0:
+    print(tmp1,tmp2,tmp3)
+else:
+    print(tmp1,tmp2)
 print('Total makespan = {}'.format(harmonogram(tmp1,tmp2,tmp3)))
 print('Czas wykonywania dla algorytmu Johnsona:{} '.format(totalj))
 print()
@@ -42,5 +48,8 @@ print('Rezultaty dla przeglądu zupełnego:')
 print("Cmax dla koljenych permutacji: {}".format(sums))
 print("Optymalne Cmax = {}".format(min))
 print("Optymlana koljeność wg przeglądu zupełnego to:")
-print(tablica1[indeks],tablica2[indeks],tablica3[indeks])
+if tablica3!=0:
+    print(tablica1[indeks],tablica2[indeks],tablica3[indeks])
+else:
+    print(tablica1[indeks], tablica2[indeks])
 print('Czas wykonania dla przeglądu zupełnego: {}'.format(totalpz))
