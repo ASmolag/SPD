@@ -1,86 +1,46 @@
-from Johnson import Johnson3maszynowy
-from Johnson import Johnson2maszynowy
-from Johnson import sortowanie
+from Johnson import Alg_Johnsona
+from przeglad import przeglad_zupelny
+from pomoc import wczytaj_plik, generowaniePrzebiegowLosowych, rozpisanie_zadan, harmonogram, sortowanie
 import time
 
-#Wczytanie pliku
-def wczytaj_plik(nazwa_pliku):
-    plik=open(nazwa_pliku)
-    try:
-        tekst=plik.read()
-    finally:
-        plik.close()
-    return tekst
+#dane = wczytaj_plik('data.txt')
+dane = generowaniePrzebiegowLosowych(4,3)
 
-#Obróbka danych do postaci tablicy int-ów
-def dane_do_tab(tekst):
-    return list(map(int, tekst.split()))
+M1,M2,M3=rozpisanie_zadan(dane)
 
-#Rozpisanie zadań na odpowiednie maszyny
-def rozpisanie_zadan(dane):
-    i=2
-    M1=[]
-    M2=[]
-    M3=[]
-    while i<(dane[0]*dane[1]+2):
-        if dane[1]==2:
-            M1.append(dane[i])
-            M2.append(dane[i+1])
-            M3=0
-        else:
-            M1.append(dane[i])
-            M2.append(dane[i+1])
-            M3.append(dane[i+2])
-        i+=dane[1]
-    return M1,M2,M3
+#Przeglad zupelny
+t0pz = time.time()
+tablica1, tablica2, tablica3, sums, min, indeks = przeglad_zupelny(M1,M2,M3)
+t1pz = time.time()
 
-#stworzenie harmonogramu
-def harmonogram(M1,M2):
-    s=M1[0]+M1[1]
-    s2=M1[0]+M2[0]
-    for i in range(1,len(M1)):
-        if s2<=s:
-            s2=s+M2[i]
-        else:
-            s2+=M2[i]
-        if i!=len(M1)-1:
-            s+=M1[i+1]
-    return s2
+totalpz = t1pz-t0pz
 
-def harmonogram3(M1,M2,M3):
-    s=M1[0]+M1[1]
-    s2=M1[0]+M2[0]
-    s3=M1[0]+M2[0]+M3[0]
-    for i in range(1,len(M1)):
-        if s2<=s:
-            s2=s+M2[i]
-        else:
-            s2+=M2[i]
-        if s3<=s2:
-            s3=s2+M3[i]
-        else:
-            s3+=M3[i]
-        if i!=len(M1)-1:
-            s+=M1[i+1]
-    return s3
+#Algorytm Johnsona
+t0j = time.time()
+kolejnosc=Alg_Johnsona(M1,M2,M3)
+t1j = time.time()
 
-M1,M2,M3=rozpisanie_zadan(dane_do_tab(wczytaj_plik('data.txt')))
-
-if M3==0:
-    t0 = time.time()
-    kolejnosc=Johnson2maszynowy(M1,M2)
-    t1 = time.time()
-else:
-    t0 = time.time()
-    kolejnosc=Johnson3maszynowy(M1,M2,M3)
-    t1 = time.time()
-
+totalj = t1j-t0j
 tmp1,tmp2,tmp3=sortowanie(M1,M2,M3,kolejnosc)
-total = t1-t0
+
 
 print("Wprowadzone dane to:")
 print(M1,M2,M3)
-print("Optymalna kolejność dla tego zestawu danych: {}".format(kolejnosc))
-print('Total makespan = {}'.format(harmonogram3(tmp1,tmp2,tmp3)))
 
-print('Czas wykonywania dla algorytmu Johnsona:{} '.format(total))
+print('Rezultaty algorytmu Johnsona:')
+print("Optymalna kolejność dla tego zestawu danych: {}".format(kolejnosc))
+print('Realizowana przez ustawienie:')
+print(tmp1,tmp2,tmp3)
+print('Total makespan = {}'.format(harmonogram(tmp1,tmp2,tmp3)))
+print('Czas wykonywania dla algorytmu Johnsona:{} '.format(totalj))
+print()
+print('Rezultaty dla przeglądu zupełnego:')
+#print('Wygenerowano przebiegi:')
+#print(tablica1)
+#print(tablica2)
+#print(tablica3)
+print("Cmax dla koljenych permutacji: {}".format(sums))
+print("Optymalne Cmax = {}".format(min))
+print("Optymlana koljeność wg przeglądu zupełnego to:")
+print(tablica1[indeks],tablica2[indeks],tablica3[indeks])
+print('Czas wykonania dla przeglądu zupełnego: {}'.format(totalpz))

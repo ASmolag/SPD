@@ -8,26 +8,12 @@ def ZnajdzNajkrotszeZadanie (M) :
     return nr_indeksu
 
 
-#def ZnajdzNajdluzszeZadanie (M) :
-#    najdluzszy = M[0]
-#    for i in range(len(M)):
-#        if M[i] > najdluzszy:
-#            najdluzszy = M[i]
-#    return najdluzszy
-
 def Johnson2maszynowy (M1, M2) :
     Maszyna1 = M1
     Maszyna2 = M2
     L1=[]
     L2=[]
     najdluzszy=99999
-#    najdluzszy1 = ZnajdzNajdluzszeZadanie(Maszyna1)
-#    najdluzszy2 = ZnajdzNajdluzszeZadanie(Maszyna2)
-#    if najdluzszy1 > najdluzszy2:
-#        najdluzszy = najdluzszy1+1
-#    else :
-#        najdluzszy = najdluzszy2+1
-
     for i in range(len(Maszyna1)):
         indeks1 = ZnajdzNajkrotszeZadanie(Maszyna1)
         indeks2 = ZnajdzNajkrotszeZadanie(Maszyna2)
@@ -53,22 +39,8 @@ def Johnson3maszynowy(Maszyna1, Maszyna2, Maszyna3):
     Kolejnosc = Johnson2maszynowy(wirtualnaMaszyna1, wirtualnaMaszyna2)
     return Kolejnosc
 
-def sortowanie(M1,M2,M3,tab):
+def Alg_Johnsona (M1,M2,M3):
     if M3!=0:
-        #tab=Johnson3maszynowy(M1,M2,M3)
-        tmp1=[]
-        tmp2=[]
-        tmp3=[]
-        for i in range(len(tab)):
-            tmp1.append(M1[tab[i]-1])
-            tmp2.append(M2[tab[i]-1])
-            tmp3.append(M3[tab[i]-1])
+        return Johnson3maszynowy(M1,M2,M3)
     else:
-        #tab = Johnson2maszynowy(M1, M2)
-        tmp1 = []
-        tmp2 = []
-        tmp3 = 0
-        for i in range(len(tab)):
-            tmp1.append(M1[tab[i] - 1])
-            tmp2.append(M2[tab[i] - 1])
-    return tmp1,tmp2,tmp3
+        return Johnson2maszynowy(M1,M2)
