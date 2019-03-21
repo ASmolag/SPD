@@ -1,4 +1,5 @@
 import random
+import itertools
 
 #Wczytanie danych
 def wczytaj_plik(nazwa_pliku):
