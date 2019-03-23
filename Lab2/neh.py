@@ -121,6 +121,7 @@ def qNEH(Maszyny):
     Priorytety = ObliczPriorytet(Maszyny)
     KolejnoscPriorytetow = SortujPriorytetem(Priorytety)
 
+    print(KolejnoscPriorytetow)
     #Zadanie 1. trywialne
     zadanie = WezZadanie(Maszyny, KolejnoscPriorytetow[0])
     ListaZadan.extend(zadanie)
@@ -130,6 +131,8 @@ def qNEH(Maszyny):
         #Najpierw należy uzupełnić wartości ścieżek dla pamiętanej kolejności
         sciezka_wy = Sciezka_wychodzaca(ListaZadan, Kolejnosc)
         sciezka_do = Sciezka_dochodzaca(ListaZadan, Kolejnosc)
+        print('do {}'.format(sciezka_do))
+        print(sciezka_wy)
         zadanie = WezZadanie(Maszyny, KolejnoscPriorytetow[i]) #Pobierz kolejne zadanie wg priorytetów
         ListaZadan.extend(zadanie)
         ListaZadan[0] = i+1 #Na liście zadań jest dokładnie i+1 zadań
@@ -143,8 +146,12 @@ def qNEH(Maszyny):
                 elif j == i: #Na końcu
                     dlugosc_trwania = Max(dlugosc_trwania, sciezka_do[(j-1)*liczba_maszyn+k]) + zadanie[k]
                 else: #W środku
-                    dlugosc_trwania = Max(dlugosc_trwania, zadanie[k]+sciezka_do[(j-1)*liczba_maszyn+k]+sciezka_wy[j*liczba_maszyn+k])
-
+                    if k==0:
+                        droga = sciezka_do[(j-1)*liczba_maszyn+k]
+                    else:
+                        droga = Max(sciezka_do[(j-1)*liczba_maszyn+k], Pamiec_drogowa) #Porównaj nowe drogi dochodzące
+                    Pamiec_drogowa = droga+zadanie[k] #Pamiętaj drogę dojścia
+                    dlugosc_trwania = Max(dlugosc_trwania, droga+sciezka_wy[j*liczba_maszyn+k]+zadanie[k])
             if dlugosc_trwania<Cmaxmin: #Gdy znaleziona ścieżka krytyczna jest lepsza niż dla innych permutacji
                 Kolejnosc_naj = Kolejnosc[:]
                 Cmaxmin = dlugosc_trwania
