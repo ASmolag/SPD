@@ -84,13 +84,13 @@ def Cmax(Maszyny, Kolejnosc): #Zwraca długość trwania najdłuższej ścieżki
     return sciezka[len(sciezka)-1]
 
 def NEH(Maszyny):
+    print(Maszyny)
     liczba_zadan = Maszyny[0]
     liczba_maszyn = Maszyny[1]
     Kolejnosc = []
     Kolejnosc_naj = []
     Cmaxmin = 9999999
     ListaZadan = [liczba_zadan, liczba_maszyn]
-
     Priorytety = ObliczPriorytet(Maszyny)
     KolejnoscPriorytetow = SortujPriorytetem(Priorytety)
     for i in range(liczba_zadan): #Dla każdego zadania
@@ -108,6 +108,7 @@ def NEH(Maszyny):
         Kolejnosc = Kolejnosc_naj[:] #Uzyskana koljeność jest podstawą do dalszych badań
     for i in range(len(Kolejnosc_naj)):
         Kolejnosc_naj[i] = KolejnoscPriorytetow[Kolejnosc[i]-1] #Zwracana kolejność w postaci pierwotnych numerów zadań. Lista "Kolejnosc" zawiera informację, w której iteracji pojawiło się zadanie w tym miejscu.
+
     return Cmaxmin, Kolejnosc_naj
 
 def qNEH(Maszyny):
@@ -117,14 +118,13 @@ def qNEH(Maszyny):
     Kolejnosc_naj = []
     Cmaxmin = 9999999
     ListaZadan = [1, liczba_maszyn]
-
     Priorytety = ObliczPriorytet(Maszyny)
     KolejnoscPriorytetow = SortujPriorytetem(Priorytety)
-
-    print(KolejnoscPriorytetow)
+    #print(KolejnoscPriorytetow)
     #Zadanie 1. trywialne
     zadanie = WezZadanie(Maszyny, KolejnoscPriorytetow[0])
     ListaZadan.extend(zadanie)
+    print("pierwsze zadania",zadanie)
 
     for i in range(1,liczba_zadan):
         Cmaxmin = 999999 #Za każdym razem Cmaxmin rozpatrywane na nowo
@@ -136,6 +136,7 @@ def qNEH(Maszyny):
         zadanie = WezZadanie(Maszyny, KolejnoscPriorytetow[i]) #Pobierz kolejne zadanie wg priorytetów
         ListaZadan.extend(zadanie)
         ListaZadan[0] = i+1 #Na liście zadań jest dokładnie i+1 zadań
+        print("w petli lista zdana to:", ListaZadan)
         for j in range (i+1):
             dlugosc_trwania=0 #Dla każdego ustawienia badane na nowo
             Kolejnosc.insert(j, i+1) #Badamy każdą permutację
@@ -160,12 +161,88 @@ def qNEH(Maszyny):
 
     for i in range(len(Kolejnosc_naj)):
         Kolejnosc_naj[i] = KolejnoscPriorytetow[Kolejnosc[i]-1]
-
+        print("osttatnie",Kolejnosc_naj)
     if liczba_zadan==1:
         Cmaxmin = Cmax(Maszyny, Kolejnosc)
 
     return Cmaxmin, Kolejnosc_naj
 
+def ModNEH(Maszyny):
+    liczba_zadan = Maszyny[0]
+    liczba_maszyn = Maszyny[1]
+    Kolejnosc = [1]
+    Kolejnosc_naj = []
+    Cmaxmin = 9999999
+    ListaZadan = [1, liczba_maszyn]
+    Priorytety = ObliczPriorytet(Maszyny)
+    KolejnoscPriorytetow = SortujPriorytetem(Priorytety)
+    #print(KolejnoscPriorytetow)
+    #Zadanie 1. trywialne
+    zadanie = WezZadanie(Maszyny, KolejnoscPriorytetow[0])
+    ListaZadan.extend(zadanie)
+
+
+    for i in range(1,liczba_zadan):
+        Cmaxmin = 999999 #Za każdym razem Cmaxmin rozpatrywane na nowo
+        #Najpierw należy uzupełnić wartości ścieżek dla pamiętanej kolejności
+        sciezka_wy = Sciezka_wychodzaca(ListaZadan, Kolejnosc)
+        sciezka_do = Sciezka_dochodzaca(ListaZadan, Kolejnosc)
+        #print('do {}'.format(sciezka_do))
+        #print(sciezka_wy)
+        zadanie = WezZadanie(Maszyny, KolejnoscPriorytetow[i]) #Pobierz kolejne zadanie wg priorytetów
+        ListaZadan.extend(zadanie)
+        ListaZadan[0] = i+1 #Na liście zadań jest dokładnie i+1 zadań
+        #print("w petli lista zdana to:", ListaZadan)
+        for j in range (i+1):
+            dlugosc_trwania=0 #Dla każdego ustawienia badane na nowo
+            Kolejnosc.insert(j, i+1) #Badamy każdą permutację
+            for k in range(liczba_maszyn): #Wybieramy ścieżkę krytyczną z powstałych wstawień
+                #Sposób oblicznia ścieżki krytycznej zależy od miejsca włożenia nowego zadania
+                if j == 0: #Na początku
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_wy[liczba_maszyn-1-k]) + zadanie[liczba_maszyn-1-k]
+                elif j == i: #Na końcu
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_do[(j-1)*liczba_maszyn+k]) + zadanie[k]
+                else: #W środku
+                    if k==0:
+                        droga = sciezka_do[(j-1)*liczba_maszyn+k]
+                    else:
+                        droga = Max(sciezka_do[(j-1)*liczba_maszyn+k], Pamiec_drogowa) #Porównaj nowe drogi dochodzące
+                    Pamiec_drogowa = droga+zadanie[k] #Pamiętaj drogę dojścia
+                    dlugosc_trwania = Max(dlugosc_trwania, droga+sciezka_wy[j*liczba_maszyn+k]+zadanie[k])
+            if dlugosc_trwania<Cmaxmin: #Gdy znaleziona ścieżka krytyczna jest lepsza niż dla innych permutacji
+                Kolejnosc_naj = Kolejnosc[:]
+                Cmaxmin = dlugosc_trwania
+            Kolejnosc.pop(j)
+        Kolejnosc = Kolejnosc_naj[:] #Zapamiętaj kolejność, dla której ścieżka krytyczna najkrótsza
+
+    ListaTmp=ListaZadan.copy()
+    ListaPomoc=[]
+    MinimalnaPoUsunieciu=99999999
+
+
+    for i in range (1,liczba_zadan):
+        print("lista tmp", ListaTmp)
+        zadanie=[]
+        start=2
+        stop=start+ListaTmp[1]
+        for j in range(start, stop):
+            zadanie.append(ListaTmp[j])
+        for k in range(start,stop):
+            del ListaTmp[start]
+
+        print("lista pomoc", zadanie)
+        print("lista tmp", ListaTmp)
+
+    #for j in range (i+1):
+
+
+    for i in range(len(Kolejnosc_naj)):
+        Kolejnosc_naj[i] = KolejnoscPriorytetow[Kolejnosc[i]-1]
+    if liczba_zadan==1:
+        Cmaxmin = Cmax(Maszyny, Kolejnosc)
+
+
+    return Cmaxmin, Kolejnosc_naj
 
 def WezZadanie (Maszyny, nr_zadania): #Pobiera z ogólnej tablicy wartości dla konkretnego zadania
     liczba_zadan=Maszyny[0]
@@ -176,21 +253,24 @@ def WezZadanie (Maszyny, nr_zadania): #Pobiera z ogólnej tablicy wartości dla 
         tmp.append(Maszyny[indeks + i])
     return tmp
 
+
+
+
 dane = wczytaj_plik('data.txt') #Wczytaj dane
 
 #NEH
-t0 = time.time()
-cmax, KolejnoscNajlepsza = NEH(dane)
-t1 = time.time()
+#t0 = time.time()
+#cmax, KolejnoscNajlepsza = NEH(dane)
+#t1 = time.time()
 
 #NEH z akceleracją
 t0q = time.time()
-cmaxq, KolejnoscNajlepszaq = qNEH(dane)
+cmaxq, KolejnoscNajlepszaq = ModNEH(dane)
 t1q = time.time()
 
-print('NEH - czas trwania: {}'.format(t1-t0))
-print('Obliczony czas trwania {}'.format(cmax))
-print('Wyznaczona kolejność {}'.format(KolejnoscNajlepsza))
+#print('NEH - czas trwania: {}'.format(t1-t0))
+#print('Obliczony czas trwania {}'.format(cmax))
+#print('Wyznaczona kolejność {}'.format(KolejnoscNajlepsza))
 
 print('qNEH - czas trwania: {}'.format(t1q-t0q))
 print('Obliczony czas trwania {}'.format(cmaxq))
