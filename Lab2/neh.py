@@ -1,5 +1,6 @@
 from pomoc import wczytaj_plik
 import time
+import math
 
 def ObliczPriorytet(Maszyny):
     i=2 #Pomijamy informację o liczbie zadań i maszyn
@@ -303,22 +304,23 @@ def WyznaczSciezkeKrytyczna (sciezka_dochodzaca, Maszyny, Kolejnosc):
     sciezka = sciezka_dochodzaca[:]
     liczba_maszyn = Maszyny[1]
     indeks = len(sciezka_dochodzaca)-1
-    sciezka_kryt = [Maszyny[Kolejnosc[indeks/liczba_maszyn]+2]]
+    print(Maszyny[Kolejnosc[math.floor(indeks/liczba_maszyn)]*liczba_maszyn+1])
+    sciezka_kryt = [Maszyny[Kolejnosc[math.floor(indeks/liczba_maszyn)]*liczba_maszyn+1]]
     while indeks > 0:
         if indeks%liczba_maszyn == 0:
             indeks -= liczba_maszyn
             for k in range(1,liczba_maszyn):
                 sciezka_kryt.append(0)
-            sciezka_kryt.append(Maszyny[indeks+2])
+            sciezka_kryt.append(Maszyny[Kolejnosc[math.floor(indeks/liczba_maszyn)]*liczba_maszyn+1])
         else:
             if sciezka_dochodzaca[indeks-liczba_maszyn] >= sciezka_dochodzaca[indeks-1]:
                 indeks-=liczba_maszyn
                 for k in range(1, liczba_maszyn):
                     sciezka_kryt.append(0)
-                sciezka_kryt.append(Maszyny[indeks+2])
+                sciezka_kryt.append(Maszyny[Kolejnosc[math.floor(indeks/liczba_maszyn)]*liczba_maszyn+1])
             else:
                 indeks-=1
-                sciezka_kryt.append(Maszyny[indeks+2])
+                sciezka_kryt.append(Maszyny[Kolejnosc[math.floor(indeks/liczba_maszyn)]*liczba_maszyn+1])
     sciezka_kryt.reverse()
     return sciezka_kryt
 
