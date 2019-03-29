@@ -250,7 +250,7 @@ def ModNEH(Maszyny):
                 Cmaxmin = dlugosc_trwania
             KolejPoUsunieciu.pop(j)
 
-        Kolejnosc = Kolejnosc_naj[:] #Zapamiętaj kolejność, dla ścieżka krytyczna najkrótsza
+        Kolejnosc = Kolejnosc_naj[:] #Zapamiętaj kolejność, dla ścieżka najkrótsza
 
 
     for i in range(len(Kolejnosc_naj)):
@@ -299,6 +299,29 @@ def WezZadanie (Maszyny, nr_zadania): #Pobiera z ogólnej tablicy wartości dla 
         tmp.append(Maszyny[indeks + i])
     return tmp
 
+def WyznaczSciezkeKrytyczna (sciezka_dochodzaca, Maszyny, Kolejnosc):
+    sciezka = sciezka_dochodzaca[:]
+    liczba_maszyn = Maszyny[1]
+    indeks = len(sciezka_dochodzaca)-1
+    sciezka_kryt = [Maszyny[Kolejnosc[indeks/liczba_maszyn]+2]]
+    while indeks > 0:
+        if indeks%liczba_maszyn == 0:
+            indeks -= liczba_maszyn
+            for k in range(1,liczba_maszyn):
+                sciezka_kryt.append(0)
+            sciezka_kryt.append(Maszyny[indeks+2])
+        else:
+            if sciezka_dochodzaca[indeks-liczba_maszyn] >= sciezka_dochodzaca[indeks-1]:
+                indeks-=liczba_maszyn
+                for k in range(1, liczba_maszyn):
+                    sciezka_kryt.append(0)
+                sciezka_kryt.append(Maszyny[indeks+2])
+            else:
+                indeks-=1
+                sciezka_kryt.append(Maszyny[indeks+2])
+    sciezka_kryt.reverse()
+    return sciezka_kryt
+
 
 
 
@@ -330,3 +353,6 @@ print('Wyznaczona kolejność {}'.format(KolejnoscNajlepszaq))
 print('ModNEH - czas trwania: {}'.format(t1m-t0m))
 print('Obliczony czas trwania {}'.format(cmaxm))
 print('Wyznaczona kolejność {}'.format(KolejnoscNajlepszam))
+
+s = WyznaczSciezkeKrytyczna(Sciezka_dochodzaca(dane, KolejnoscNajlepsza), dane, KolejnoscNajlepsza)
+print(s)
