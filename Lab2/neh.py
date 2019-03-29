@@ -162,7 +162,7 @@ def qNEH(Maszyny):
 
     return Cmaxmin, Kolejnosc_naj
 
-def ModNEH(Maszyny):
+def ModNEH4(Maszyny):
     liczba_zadan = Maszyny[0]
     liczba_maszyn = Maszyny[1]
     Kolejnosc = [1]
@@ -262,6 +262,301 @@ def ModNEH(Maszyny):
 
     return Cmaxmin, Kolejnosc_naj
 
+def ModNEH1(Maszyny):
+    liczba_zadan = Maszyny[0]
+    liczba_maszyn = Maszyny[1]
+    Kolejnosc = [1]
+    Kolejnosc_naj = []
+    KolejPoUsunieciu = []
+    Cmaxmin = 9999999
+    ListaZadan = [1, liczba_maszyn]
+    Priorytety = ObliczPriorytet(Maszyny)
+    KolejnoscPriorytetow = SortujPriorytetem(Priorytety)
+    #print(KolejnoscPriorytetow)
+    #Zadanie 1. trywialne
+    zadanie = WezZadanie(Maszyny, KolejnoscPriorytetow[0])
+    ListaZadan.extend(zadanie)
+
+
+    for i in range(1,liczba_zadan):
+        Cmaxmin = 999999 #Za każdym razem Cmaxmin rozpatrywane na nowo
+        #Najpierw należy uzupełnić wartości ścieżek dla pamiętanej kolejności
+        sciezka_wy = Sciezka_wychodzaca(ListaZadan, Kolejnosc)
+        sciezka_do = Sciezka_dochodzaca(ListaZadan, Kolejnosc)
+        zadanie = WezZadanie(Maszyny, KolejnoscPriorytetow[i]) #Pobierz kolejne zadanie wg priorytetów
+        ListaZadan.extend(zadanie)
+        ListaZadan[0] = i+1 #Na liście zadań jest dokładnie i+1 zadań
+        for j in range (i+1):
+            dlugosc_trwania=0 #Dla każdego ustawienia badane na nowo
+            Kolejnosc.insert(j, i+1) #Badamy każdą permutację
+            for k in range(liczba_maszyn): #Wybieramy ścieżkę krytyczną z powstałych wstawień
+                #Sposób oblicznia ścieżki krytycznej zależy od miejsca włożenia nowego zadania
+                if j == 0: #Na początku
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_wy[liczba_maszyn-1-k]) + zadanie[liczba_maszyn-1-k]
+                elif j == i: #Na końcu
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_do[(j-1)*liczba_maszyn+k]) + zadanie[k]
+                else: #W środku
+                    if k==0:
+                        droga = sciezka_do[(j-1)*liczba_maszyn+k]
+                    else:
+                        droga = Max(sciezka_do[(j-1)*liczba_maszyn+k], Pamiec_drogowa) #Porównaj nowe drogi dochodzące
+                    Pamiec_drogowa = droga+zadanie[k] #Pamiętaj drogę dojścia
+                    dlugosc_trwania = Max(dlugosc_trwania, droga+sciezka_wy[j*liczba_maszyn+k]+zadanie[k])
+            if dlugosc_trwania<Cmaxmin: #Gdy znaleziona ścieżka jest lepsza niż dla innych permutacji
+                Kolejnosc_naj = Kolejnosc[:]
+                Cmaxmin = dlugosc_trwania
+            Kolejnosc.pop(j)
+        Kolejnosc = Kolejnosc_naj[:] #Zapamiętaj kolejność, dla której ścieżka najkrótsza
+
+        #MODYFIKACJA 1
+        sciezka_do = Sciezka_dochodzaca(ListaZadan, Kolejnosc)
+
+        sciezka_krytyczna = WyznaczSciezkeKrytyczna(sciezka_do, liczba_maszyn)
+        indeks_najdluzszej_operacji = ZnajdzNajdluzszeZadanie(sciezka_krytyczna)
+        numer_zadanie_usunietego = math.floor(indeks_najdluzszej_operacji/liczba_maszyn)+1
+
+        usuniete = Usun_zadanie(ListaZadan, numer_zadanie_usunietego) #Usuń znalezione zadanie z listy zadań
+        KolejPoUsunieciu = WeryfikujKolejnosc(Kolejnosc, numer_zadanie_usunietego)
+
+        sciezka_wy = Sciezka_wychodzaca(ListaZadan, KolejPoUsunieciu) #Wyznacz ścieżkę dochodzącą i wychodzącą w tej sytuacji
+        sciezka_do = Sciezka_dochodzaca(ListaZadan, KolejPoUsunieciu)
+
+        Dodaj_zadanie(usuniete, ListaZadan, numer_zadanie_usunietego) #Przywróć zadanie na listę
+        NaprawKolejnosc(KolejPoUsunieciu, numer_zadanie_usunietego)
+
+
+        for j in range (i+1):
+            dlugosc_trwania=0 #Dla każdego ustawienia badane na nowo
+            KolejPoUsunieciu.insert(j, numer_zadanie_usunietego) #Badamy każdą permutację, wstawiając zadanie właśnie usunięte
+            for k in range(liczba_maszyn): #Wybieramy ścieżkę krytyczną z powstałych wstawień
+                #Sposób oblicznia ścieżki krytycznej zależy od miejsca włożenia nowego zadania
+                if j == 0: #Na początku
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_wy[liczba_maszyn-1-k]) + usuniete[liczba_maszyn-1-k]
+                elif j == i: #Na końcu
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_do[(j-1)*liczba_maszyn+k]) + usuniete[k]
+                else: #W środku
+                    if k==0:
+                        droga = sciezka_do[(j-1)*liczba_maszyn+k]
+                    else:
+                        droga = Max(sciezka_do[(j-1)*liczba_maszyn+k], Pamiec_drogowa) #Porównaj nowe drogi dochodzące
+                    Pamiec_drogowa = droga+usuniete[k] #Pamiętaj drogę dojścia
+                    dlugosc_trwania = Max(dlugosc_trwania, droga+sciezka_wy[j*liczba_maszyn+k]+usuniete[k])
+            if dlugosc_trwania<Cmaxmin: #Gdy znaleziona ścieżka jest lepsza niż dla innych permutacji
+                Kolejnosc_naj = KolejPoUsunieciu[:]
+                Cmaxmin = dlugosc_trwania
+            KolejPoUsunieciu.pop(j)
+
+        Kolejnosc = Kolejnosc_naj[:] #Zapamiętaj kolejność, dla ścieżka najkrótsza
+
+
+    for i in range(len(Kolejnosc_naj)):
+        Kolejnosc_naj[i] = KolejnoscPriorytetow[Kolejnosc[i]-1]
+    if liczba_zadan==1:
+        Cmaxmin = Cmax(Maszyny, Kolejnosc)
+
+
+    return Cmaxmin, Kolejnosc_naj
+
+def ModNEH2(Maszyny):
+    liczba_zadan = Maszyny[0]
+    liczba_maszyn = Maszyny[1]
+    Kolejnosc = [1]
+    Kolejnosc_naj = []
+    KolejPoUsunieciu = []
+    Cmaxmin = 9999999
+    ListaZadan = [1, liczba_maszyn]
+    Priorytety = ObliczPriorytet(Maszyny)
+    KolejnoscPriorytetow = SortujPriorytetem(Priorytety)
+    #print(KolejnoscPriorytetow)
+    #Zadanie 1. trywialne
+    zadanie = WezZadanie(Maszyny, KolejnoscPriorytetow[0])
+    ListaZadan.extend(zadanie)
+
+
+    for i in range(1,liczba_zadan):
+        Cmaxmin = 999999 #Za każdym razem Cmaxmin rozpatrywane na nowo
+        #Najpierw należy uzupełnić wartości ścieżek dla pamiętanej kolejności
+        sciezka_wy = Sciezka_wychodzaca(ListaZadan, Kolejnosc)
+        sciezka_do = Sciezka_dochodzaca(ListaZadan, Kolejnosc)
+        zadanie = WezZadanie(Maszyny, KolejnoscPriorytetow[i]) #Pobierz kolejne zadanie wg priorytetów
+        ListaZadan.extend(zadanie)
+        ListaZadan[0] = i+1 #Na liście zadań jest dokładnie i+1 zadań
+        for j in range (i+1):
+            dlugosc_trwania=0 #Dla każdego ustawienia badane na nowo
+            Kolejnosc.insert(j, i+1) #Badamy każdą permutację
+            for k in range(liczba_maszyn): #Wybieramy ścieżkę krytyczną z powstałych wstawień
+                #Sposób oblicznia ścieżki krytycznej zależy od miejsca włożenia nowego zadania
+                if j == 0: #Na początku
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_wy[liczba_maszyn-1-k]) + zadanie[liczba_maszyn-1-k]
+                elif j == i: #Na końcu
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_do[(j-1)*liczba_maszyn+k]) + zadanie[k]
+                else: #W środku
+                    if k==0:
+                        droga = sciezka_do[(j-1)*liczba_maszyn+k]
+                    else:
+                        droga = Max(sciezka_do[(j-1)*liczba_maszyn+k], Pamiec_drogowa) #Porównaj nowe drogi dochodzące
+                    Pamiec_drogowa = droga+zadanie[k] #Pamiętaj drogę dojścia
+                    dlugosc_trwania = Max(dlugosc_trwania, droga+sciezka_wy[j*liczba_maszyn+k]+zadanie[k])
+            if dlugosc_trwania<Cmaxmin: #Gdy znaleziona ścieżka jest lepsza niż dla innych permutacji
+                Kolejnosc_naj = Kolejnosc[:]
+                Cmaxmin = dlugosc_trwania
+            Kolejnosc.pop(j)
+        Kolejnosc = Kolejnosc_naj[:] #Zapamiętaj kolejność, dla której ścieżka najkrótsza
+
+        #MODYFIKACJA 2
+        sciezka_do = Sciezka_dochodzaca(ListaZadan, Kolejnosc)
+
+        sciezka_krytyczna = WyznaczSciezkeKrytyczna(sciezka_do, liczba_maszyn)
+        numer_zadanie_usunietego = NajwiekszaSumaOperacji(sciezka_krytyczna, liczba_maszyn, ListaZadan[0])
+
+        usuniete = Usun_zadanie(ListaZadan, numer_zadanie_usunietego) #Usuń znalezione zadanie z listy zadań
+        KolejPoUsunieciu = WeryfikujKolejnosc(Kolejnosc, numer_zadanie_usunietego)
+
+        sciezka_wy = Sciezka_wychodzaca(ListaZadan, KolejPoUsunieciu) #Wyznacz ścieżkę dochodzącą i wychodzącą w tej sytuacji
+        sciezka_do = Sciezka_dochodzaca(ListaZadan, KolejPoUsunieciu)
+
+        Dodaj_zadanie(usuniete, ListaZadan, numer_zadanie_usunietego) #Przywróć zadanie na listę
+        NaprawKolejnosc(KolejPoUsunieciu, numer_zadanie_usunietego)
+
+
+        for j in range (i+1):
+            dlugosc_trwania=0 #Dla każdego ustawienia badane na nowo
+            KolejPoUsunieciu.insert(j, numer_zadanie_usunietego) #Badamy każdą permutację, wstawiając zadanie właśnie usunięte
+            for k in range(liczba_maszyn): #Wybieramy ścieżkę krytyczną z powstałych wstawień
+                #Sposób oblicznia ścieżki krytycznej zależy od miejsca włożenia nowego zadania
+                if j == 0: #Na początku
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_wy[liczba_maszyn-1-k]) + usuniete[liczba_maszyn-1-k]
+                elif j == i: #Na końcu
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_do[(j-1)*liczba_maszyn+k]) + usuniete[k]
+                else: #W środku
+                    if k==0:
+                        droga = sciezka_do[(j-1)*liczba_maszyn+k]
+                    else:
+                        droga = Max(sciezka_do[(j-1)*liczba_maszyn+k], Pamiec_drogowa) #Porównaj nowe drogi dochodzące
+                    Pamiec_drogowa = droga+usuniete[k] #Pamiętaj drogę dojścia
+                    dlugosc_trwania = Max(dlugosc_trwania, droga+sciezka_wy[j*liczba_maszyn+k]+usuniete[k])
+            if dlugosc_trwania<Cmaxmin: #Gdy znaleziona ścieżka jest lepsza niż dla innych permutacji
+                Kolejnosc_naj = KolejPoUsunieciu[:]
+                Cmaxmin = dlugosc_trwania
+            KolejPoUsunieciu.pop(j)
+
+        Kolejnosc = Kolejnosc_naj[:] #Zapamiętaj kolejność, dla ścieżka najkrótsza
+
+
+    for i in range(len(Kolejnosc_naj)):
+        Kolejnosc_naj[i] = KolejnoscPriorytetow[Kolejnosc[i]-1]
+    if liczba_zadan==1:
+        Cmaxmin = Cmax(Maszyny, Kolejnosc)
+
+
+    return Cmaxmin, Kolejnosc_naj
+
+def ModNEH3(Maszyny):
+    liczba_zadan = Maszyny[0]
+    liczba_maszyn = Maszyny[1]
+    Kolejnosc = [1]
+    Kolejnosc_naj = []
+    KolejPoUsunieciu = []
+    Cmaxmin = 9999999
+    ListaZadan = [1, liczba_maszyn]
+    Priorytety = ObliczPriorytet(Maszyny)
+    KolejnoscPriorytetow = SortujPriorytetem(Priorytety)
+    #print(KolejnoscPriorytetow)
+    #Zadanie 1. trywialne
+    zadanie = WezZadanie(Maszyny, KolejnoscPriorytetow[0])
+    ListaZadan.extend(zadanie)
+
+
+    for i in range(1,liczba_zadan):
+        Cmaxmin = 999999 #Za każdym razem Cmaxmin rozpatrywane na nowo
+        #Najpierw należy uzupełnić wartości ścieżek dla pamiętanej kolejności
+        sciezka_wy = Sciezka_wychodzaca(ListaZadan, Kolejnosc)
+        sciezka_do = Sciezka_dochodzaca(ListaZadan, Kolejnosc)
+        zadanie = WezZadanie(Maszyny, KolejnoscPriorytetow[i]) #Pobierz kolejne zadanie wg priorytetów
+        ListaZadan.extend(zadanie)
+        ListaZadan[0] = i+1 #Na liście zadań jest dokładnie i+1 zadań
+        for j in range (i+1):
+            dlugosc_trwania=0 #Dla każdego ustawienia badane na nowo
+            Kolejnosc.insert(j, i+1) #Badamy każdą permutację
+            for k in range(liczba_maszyn): #Wybieramy ścieżkę krytyczną z powstałych wstawień
+                #Sposób oblicznia ścieżki krytycznej zależy od miejsca włożenia nowego zadania
+                if j == 0: #Na początku
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_wy[liczba_maszyn-1-k]) + zadanie[liczba_maszyn-1-k]
+                elif j == i: #Na końcu
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_do[(j-1)*liczba_maszyn+k]) + zadanie[k]
+                else: #W środku
+                    if k==0:
+                        droga = sciezka_do[(j-1)*liczba_maszyn+k]
+                    else:
+                        droga = Max(sciezka_do[(j-1)*liczba_maszyn+k], Pamiec_drogowa) #Porównaj nowe drogi dochodzące
+                    Pamiec_drogowa = droga+zadanie[k] #Pamiętaj drogę dojścia
+                    dlugosc_trwania = Max(dlugosc_trwania, droga+sciezka_wy[j*liczba_maszyn+k]+zadanie[k])
+            if dlugosc_trwania<Cmaxmin: #Gdy znaleziona ścieżka jest lepsza niż dla innych permutacji
+                Kolejnosc_naj = Kolejnosc[:]
+                Cmaxmin = dlugosc_trwania
+            Kolejnosc.pop(j)
+        Kolejnosc = Kolejnosc_naj[:] #Zapamiętaj kolejność, dla której ścieżka najkrótsza
+
+        #MODYFIKACJA 3
+        sciezka_do = Sciezka_dochodzaca(ListaZadan, Kolejnosc)
+
+        sciezka_krytyczna = WyznaczSciezkeKrytyczna(sciezka_do, liczba_maszyn)
+        numer_zadanie_usunietego = NajwiekszaLiczbaOperacji(sciezka_krytyczna, liczba_maszyn, ListaZadan[0])
+
+        usuniete = Usun_zadanie(ListaZadan, numer_zadanie_usunietego) #Usuń znalezione zadanie z listy zadań
+        KolejPoUsunieciu = WeryfikujKolejnosc(Kolejnosc, numer_zadanie_usunietego)
+
+        sciezka_wy = Sciezka_wychodzaca(ListaZadan, KolejPoUsunieciu) #Wyznacz ścieżkę dochodzącą i wychodzącą w tej sytuacji
+        sciezka_do = Sciezka_dochodzaca(ListaZadan, KolejPoUsunieciu)
+
+        Dodaj_zadanie(usuniete, ListaZadan, numer_zadanie_usunietego) #Przywróć zadanie na listę
+        NaprawKolejnosc(KolejPoUsunieciu, numer_zadanie_usunietego)
+
+
+        for j in range (i+1):
+            dlugosc_trwania=0 #Dla każdego ustawienia badane na nowo
+            KolejPoUsunieciu.insert(j, numer_zadanie_usunietego) #Badamy każdą permutację, wstawiając zadanie właśnie usunięte
+            for k in range(liczba_maszyn): #Wybieramy ścieżkę krytyczną z powstałych wstawień
+                #Sposób oblicznia ścieżki krytycznej zależy od miejsca włożenia nowego zadania
+                if j == 0: #Na początku
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_wy[liczba_maszyn-1-k]) + usuniete[liczba_maszyn-1-k]
+                elif j == i: #Na końcu
+                    dlugosc_trwania = Max(dlugosc_trwania, sciezka_do[(j-1)*liczba_maszyn+k]) + usuniete[k]
+                else: #W środku
+                    if k==0:
+                        droga = sciezka_do[(j-1)*liczba_maszyn+k]
+                    else:
+                        droga = Max(sciezka_do[(j-1)*liczba_maszyn+k], Pamiec_drogowa) #Porównaj nowe drogi dochodzące
+                    Pamiec_drogowa = droga+usuniete[k] #Pamiętaj drogę dojścia
+                    dlugosc_trwania = Max(dlugosc_trwania, droga+sciezka_wy[j*liczba_maszyn+k]+usuniete[k])
+            if dlugosc_trwania<Cmaxmin: #Gdy znaleziona ścieżka jest lepsza niż dla innych permutacji
+                Kolejnosc_naj = KolejPoUsunieciu[:]
+                Cmaxmin = dlugosc_trwania
+            KolejPoUsunieciu.pop(j)
+
+        Kolejnosc = Kolejnosc_naj[:] #Zapamiętaj kolejność, dla ścieżka najkrótsza
+
+
+    for i in range(len(Kolejnosc_naj)):
+        Kolejnosc_naj[i] = KolejnoscPriorytetow[Kolejnosc[i]-1]
+    if liczba_zadan==1:
+        Cmaxmin = Cmax(Maszyny, Kolejnosc)
+
+
+    return Cmaxmin, Kolejnosc_naj
+
+def NajwiekszaLiczbaOperacji(sciezka_krytyczna, liczba_maszyn, liczba_zadan):
+    MaxZadan = 0
+    Zadan = 0
+    for i in range(liczba_zadan):
+        for j in range(liczba_maszyn):
+            if sciezka_krytyczna[i+j]!=0:
+                Zadan+=1
+        if Zadan>MaxZadan:
+            MaxZadan = Zadan
+            nr_zadania = i+1
+    return nr_zadania
+
 def Usun_zadanie(ListaZadan, nr_zadania):
     zadanie_usuniete = []
     liczba_maszyn = ListaZadan[1]
@@ -300,32 +595,45 @@ def WezZadanie (Maszyny, nr_zadania): #Pobiera z ogólnej tablicy wartości dla 
         tmp.append(Maszyny[indeks + i])
     return tmp
 
-def WyznaczSciezkeKrytyczna (sciezka_dochodzaca, Maszyny, Kolejnosc):
+def WyznaczSciezkeKrytyczna (sciezka_dochodzaca, liczba_maszyn):
     sciezka = sciezka_dochodzaca[:]
-    liczba_maszyn = Maszyny[1]
     indeks = len(sciezka_dochodzaca)-1
-    print(Maszyny[Kolejnosc[math.floor(indeks/liczba_maszyn)]*liczba_maszyn+1])
-    sciezka_kryt = [Maszyny[Kolejnosc[math.floor(indeks/liczba_maszyn)]*liczba_maszyn+1]]
+    sciezka_kryt = []
+
     while indeks > 0:
         if indeks%liczba_maszyn == 0:
+            sciezka_kryt.append(-sciezka_dochodzaca[indeks-liczba_maszyn] + sciezka_dochodzaca[indeks])
             indeks -= liczba_maszyn
-            for k in range(1,liczba_maszyn):
+            for k in range(1, liczba_maszyn):
                 sciezka_kryt.append(0)
-            sciezka_kryt.append(Maszyny[Kolejnosc[math.floor(indeks/liczba_maszyn)]*liczba_maszyn+1])
+        elif indeks<liczba_maszyn:
+            sciezka_kryt.append(-sciezka_dochodzaca[indeks - 1] + sciezka_dochodzaca[indeks])
+            indeks -= 1
         else:
             if sciezka_dochodzaca[indeks-liczba_maszyn] >= sciezka_dochodzaca[indeks-1]:
-                indeks-=liczba_maszyn
+                sciezka_kryt.append(-sciezka_dochodzaca[indeks-liczba_maszyn] + sciezka_dochodzaca[indeks])
+                indeks -= liczba_maszyn
                 for k in range(1, liczba_maszyn):
                     sciezka_kryt.append(0)
-                sciezka_kryt.append(Maszyny[Kolejnosc[math.floor(indeks/liczba_maszyn)]*liczba_maszyn+1])
+
             else:
-                indeks-=1
-                sciezka_kryt.append(Maszyny[Kolejnosc[math.floor(indeks/liczba_maszyn)]*liczba_maszyn+1])
+                sciezka_kryt.append(-sciezka_dochodzaca[indeks-1] + sciezka_dochodzaca[indeks])
+                indeks -= 1
+    sciezka_kryt.append(sciezka_dochodzaca[indeks]) #Początek
     sciezka_kryt.reverse()
     return sciezka_kryt
 
-
-
+def NajwiekszaSumaOperacji (sciezka_krytyczna, liczba_maszyn, liczba_zadan):
+    SumMax = 0
+    Sum = 0
+    for i in range(liczba_zadan):
+        for j in range(liczba_maszyn):
+           Sum += sciezka_krytyczna[i+j]
+        if Sum > SumMax:
+            SumMax = Sum
+            nr_zadania = i+1
+        Sum = 0
+    return nr_zadania
 
 dane = wczytaj_plik('data.txt') #Wczytaj dane
 
@@ -339,10 +647,25 @@ t0q = time.time()
 cmaxq, KolejnoscNajlepszaq = qNEH(dane)
 t1q = time.time()
 
-#NEH z modyfikacją
-t0m = time.time()
-cmaxm, KolejnoscNajlepszam = ModNEH(dane)
-t1m = time.time()
+#NEH z modyfikacją 1
+t0m1 = time.time()
+cmaxm1, KolejnoscNajlepszam1 = ModNEH1(dane)
+t1m1 = time.time()
+
+#NEH z modyfikacją 2
+t0m2 = time.time()
+cmaxm2, KolejnoscNajlepszam2 = ModNEH2(dane)
+t1m2 = time.time()
+
+#NEH z modyfikacją 3
+t0m3 = time.time()
+cmaxm3, KolejnoscNajlepszam3 = ModNEH3(dane)
+t1m3 = time.time()
+
+#NEH z modyfikacją 4
+t0m4 = time.time()
+cmaxm4, KolejnoscNajlepszam4 = ModNEH4(dane)
+t1m4 = time.time()
 
 print('NEH - czas trwania: {}'.format(t1-t0))
 print('Obliczony czas trwania {}'.format(cmax))
@@ -352,9 +675,18 @@ print('qNEH - czas trwania: {}'.format(t1q-t0q))
 print('Obliczony czas trwania {}'.format(cmaxq))
 print('Wyznaczona kolejność {}'.format(KolejnoscNajlepszaq))
 
-print('ModNEH - czas trwania: {}'.format(t1m-t0m))
-print('Obliczony czas trwania {}'.format(cmaxm))
-print('Wyznaczona kolejność {}'.format(KolejnoscNajlepszam))
+print('ModNEH1 - czas trwania: {}'.format(t1m1-t0m1))
+print('Obliczony czas trwania {}'.format(cmaxm1))
+print('Wyznaczona kolejność {}'.format(KolejnoscNajlepszam1))
 
-s = WyznaczSciezkeKrytyczna(Sciezka_dochodzaca(dane, KolejnoscNajlepsza), dane, KolejnoscNajlepsza)
-print(s)
+print('ModNEH2 - czas trwania: {}'.format(t1m2-t0m2))
+print('Obliczony czas trwania {}'.format(cmaxm2))
+print('Wyznaczona kolejność {}'.format(KolejnoscNajlepszam2))
+
+print('ModNEH3 - czas trwania: {}'.format(t1m3-t0m3))
+print('Obliczony czas trwania {}'.format(cmaxm3))
+print('Wyznaczona kolejność {}'.format(KolejnoscNajlepszam3))
+
+print('ModNEH4 - czas trwania: {}'.format(t1m4-t0m4))
+print('Obliczony czas trwania {}'.format(cmaxm4))
+print('Wyznaczona kolejność {}'.format(KolejnoscNajlepszam4))
