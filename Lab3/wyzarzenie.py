@@ -8,7 +8,14 @@ def Wyzarzanie (Maszyny):
     #inicjalizacja
     C, Kolejnosc = qNEH(Maszyny)
     T = 1000
-    mi = 0.99
+    #mi = 0.99
+    #wplywa na ilosc iteracji, czym mniejszy tym wiecej iteracji
+    mi = 0.95
+    # mi = 0.9
+    # mi = 0.8
+    # mi = 0.4
+    # mi = 0.01
+    # mi= 0.01
 
     while T > 5:
         #generowanie ruchu
@@ -43,18 +50,47 @@ def Swap(Kolejnosc):
     tmp[miejsce_zadanie2] = Kolejnosc[miejsce_zadanie1]
     return tmp
 
-#dane = wczytaj_plik('data4.txt') #Wczytaj dane
+def Insert(Kolejnosc):
+    tmp = Kolejnosc[:]
+    zdejmij_zadanie = random.randrange(len(Kolejnosc))
+    nr_zadania = tmp.pop(zdejmij_zadanie)
+    wsadz_zadanie = random.randrange(len(Kolejnosc))
+    while zdejmij_zadanie == wsadz_zadanie:
+        wsadz_zadanie=random.randrange(len(Kolejnosc))
+    tmp.insert(wsadz_zadanie, nr_zadania)
+    return tmp
+
+dane = wczytaj_plik('data4.txt') #Wczytaj dane
+
+Cmax_var, Kolejnosc = Wyzarzanie(dane)
+print(Cmax_var)
 dane = wczytaj_plik('data16.txt')
-Cmax, Kolejnosc = Wyzarzanie(dane)
-print("Cmax: ", Cmax, ", Kolejnosc: ", Kolejnosc)
+Cmax_var, Kolejnosc = Wyzarzanie(dane)
+print(Cmax_var)
 dane = wczytaj_plik('data25.txt')
-#dane = wczytaj_plik('data31.txt')
-#dane = wczytaj_plik('data43.txt')
-#dane = wczytaj_plik('data54.txt')
-#dane = wczytaj_plik('data63.txt')
-#dane = wczytaj_plik('data72.txt')
-#dane = wczytaj_plik('data81.txt')
-#dane = wczytaj_plik('data93.txt')
-#dane = wczytaj_plik('data105.txt')
-Cmax, Kolejnosc = Wyzarzanie(dane)
-print("Cmax: ", Cmax, ", Kolejnosc: ", Kolejnosc)
+Cmax_var, Kolejnosc = Wyzarzanie(dane)
+print(Cmax_var)
+dane = wczytaj_plik('data31.txt')
+Cmax_var, Kolejnosc = Wyzarzanie(dane)
+print(Cmax_var)
+dane = wczytaj_plik('data43.txt')
+Cmax_var, Kolejnosc = Wyzarzanie(dane)
+print(Cmax_var)
+dane = wczytaj_plik('data54.txt')
+Cmax_var, Kolejnosc = Wyzarzanie(dane)
+print(Cmax_var)
+dane = wczytaj_plik('data63.txt')
+Cmax_var, Kolejnosc = Wyzarzanie(dane)
+print(Cmax_var)
+dane = wczytaj_plik('data72.txt')
+Cmax_var, Kolejnosc = Wyzarzanie(dane)
+print(Cmax_var)
+dane = wczytaj_plik('data81.txt')
+Cmax_var, Kolejnosc = Wyzarzanie(dane)
+print(Cmax_var)
+dane = wczytaj_plik('data93.txt')
+Cmax_var, Kolejnosc = Wyzarzanie(dane)
+print(Cmax_var)
+dane = wczytaj_plik('data105.txt')
+Cmax_var, Kolejnosc = Wyzarzanie(dane)
+print(Cmax_var)
