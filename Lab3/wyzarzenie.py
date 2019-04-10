@@ -8,9 +8,9 @@ def Wyzarzanie (Maszyny):
     #inicjalizacja
     C, Kolejnosc = qNEH(Maszyny)
     T = 1000
-    mi = 0.8
+    mi = 0.99
 
-    while T > 50:
+    while T > 5:
         #generowanie ruchu
         Kolejnosc_prim = Swap(Kolejnosc)
 
@@ -43,8 +43,18 @@ def Swap(Kolejnosc):
     tmp[miejsce_zadanie2] = Kolejnosc[miejsce_zadanie1]
     return tmp
 
-dane = wczytaj_plik('data.txt') #Wczytaj dane
-
+#dane = wczytaj_plik('data4.txt') #Wczytaj dane
+dane = wczytaj_plik('data16.txt')
 Cmax, Kolejnosc = Wyzarzanie(dane)
-
-print(Cmax, Kolejnosc)
+print("Cmax: ", Cmax, ", Kolejnosc: ", Kolejnosc)
+dane = wczytaj_plik('data25.txt')
+#dane = wczytaj_plik('data31.txt')
+#dane = wczytaj_plik('data43.txt')
+#dane = wczytaj_plik('data54.txt')
+#dane = wczytaj_plik('data63.txt')
+#dane = wczytaj_plik('data72.txt')
+#dane = wczytaj_plik('data81.txt')
+#dane = wczytaj_plik('data93.txt')
+#dane = wczytaj_plik('data105.txt')
+Cmax, Kolejnosc = Wyzarzanie(dane)
+print("Cmax: ", Cmax, ", Kolejnosc: ", Kolejnosc)
