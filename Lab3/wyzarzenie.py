@@ -7,17 +7,21 @@ def Wyzarzanie (Maszyny):
 
     #inicjalizacja
     C, Kolejnosc = qNEH(Maszyny)
-    T = 1000
+    #T = 1000
+    #T=1200
+    k=0 #zmienna iteracyjna
+    kmax=842
     #mi = 0.99
     #wplywa na ilosc iteracji, czym mniejszy tym wiecej iteracji
-    mi = 0.95
-    # mi = 0.9
-    # mi = 0.8
-    # mi = 0.4
+    #mi = 0.95
+    #mi = 0.9
+    #mi = 0.8
+    #mi = 0.4
     # mi = 0.01
     # mi= 0.01
-
-    while T > 5:
+    Tk=3
+    #while T > Tk:
+    while k!=kmax:
         #generowanie ruchu
         Kolejnosc_prim = Swap(Kolejnosc)
 
@@ -34,9 +38,11 @@ def Wyzarzanie (Maszyny):
             Kolejnosc = Kolejnosc_prim[:]
             C = Cprim
 
+        k += 1
         #Schładzanie
-        T = mi*T
-
+        #T = mi*T
+        T=T*k/kmax; # alternatywna fukcja schladzania
+        #print("to jest k",k)
     return C, Kolejnosc
 
 
