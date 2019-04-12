@@ -4,9 +4,15 @@ import random
 import math
 
 def Wyzarzanie (Maszyny):
-
     #inicjalizacja
     C, Kolejnosc = qNEH(Maszyny)
+    #Mod6: Losowe ustalenie kolejnosci poczatkowej
+    #Kolejnosc = [1]
+    #for i in range(1, Maszyny[0]):
+    #    Kolejnosc.insert(random.randrange(len(Kolejnosc)), i+1)
+    #C = Cmax(Maszyny, Kolejnosc)
+
+    T = 1000
     #T = 1000
     #T=1200
     k=0 #zmienna iteracyjna
@@ -28,11 +34,14 @@ def Wyzarzanie (Maszyny):
         #Potencjalny ruch
         Cprim = Cmax(Maszyny, Kolejnosc_prim)
 
+        #if Cprim==C: #Mod5: Jesli nowe Cmax jest takie samo, to losuj ponownie
+        #    continue
+
         if Cprim < C:
             p = 1
 
         else:
-            p = math.exp((C - Cprim)/T)
+            p = math.exp((C - Cprim)/T) #Mod4: Nie uwzgledniamy zaleznosci miedzy C a Cprim. Zawsze obliczamy p wg wzoru
 
         if p >= random.random(): #Warunek ruchu
             Kolejnosc = Kolejnosc_prim[:]
@@ -67,7 +76,6 @@ def Insert(Kolejnosc):
     return tmp
 
 dane = wczytaj_plik('data4.txt') #Wczytaj dane
-
 Cmax_var, Kolejnosc = Wyzarzanie(dane)
 print(Cmax_var)
 dane = wczytaj_plik('data16.txt')
