@@ -5,45 +5,49 @@ import math
 
 def Wyzarzanie (Maszyny):
     #inicjalizacja
-    C, Kolejnosc = qNEH(Maszyny)
-    #Mod6: Losowe ustalenie kolejnosci poczatkowej
-    #Kolejnosc = [1]
-    #for i in range(1, Maszyny[0]):
-    #    Kolejnosc.insert(random.randrange(len(Kolejnosc)), i+1)
-    #C = Cmax(Maszyny, Kolejnosc)
+    T0=300 #Temp. poczatkowa
+    Tf=1 #Temp. koncowa
+    npmax=120 #liczba perturbacji w ramach 1 iteracji
 
-    T = 1000
-    #mi = 0.99
-    #wplywa na ilosc iteracji, czym mniejszy tym wiecej iteracji
-    mi = 0.95
+    alfa = 0.95 #wspolczynnik chlodzenia
+    # mi = 0.95
     # mi = 0.9
     # mi = 0.8
     # mi = 0.4
     # mi = 0.01
     # mi= 0.01
 
-    while T > 5:
-        #generowanie ruchu
-        Kolejnosc_prim = Swap(Kolejnosc)
+    #Losowe ustalenie kolejnosci poczatkowej
+    Kolejnosc = [1]
+    for i in range(1, Maszyny[0]):
+        Kolejnosc.insert(random.randrange(len(Kolejnosc)), i+1)
+    C = Cmax(Maszyny, Kolejnosc)
 
-        #Potencjalny ruch
-        Cprim = Cmax(Maszyny, Kolejnosc_prim)
+    T=T0
 
-        #if Cprim==C: #Mod5: Jesli nowe Cmax jest takie samo, to losuj ponownie
-        #    continue
+    while T > Tf: #Temperature cycle
+        for np in range(1,npmax): #Metropolis Cycle
+            #generowanie ruchu
+            Kolejnosc_prim = Swap(Kolejnosc) #Innym krokiem może byc Insert
 
-        if Cprim < C:
-            p = 1
+            #Potencjalny ruch
+            Cprim = Cmax(Maszyny, Kolejnosc_prim)
 
-        else:
-            p = math.exp((C - Cprim)/T) #Mod4: Nie uwzgledniamy zaleznosci miedzy C a Cprim. Zawsze obliczamy p wg wzoru
+            deltaf = Cprim-C #roznica
 
-        if p >= random.random(): #Warunek ruchu
-            Kolejnosc = Kolejnosc_prim[:]
-            C = Cprim
+            if deltaf < 0:
+                C = Cprim
+                Kolejnosc = Kolejnosc_prim[:]
+
+            else:
+                BoltzmannP = 1/(1+2*math.exp(deltaf/T))
+
+                if BoltzmannP > (random.random()/3): #Warunek ruchu
+                    Kolejnosc = Kolejnosc_prim[:]
+                    C = Cprim
 
         #Schładzanie
-        T = mi*T
+        T = alfa*T
 
     return C, Kolejnosc
 
@@ -71,33 +75,55 @@ def Insert(Kolejnosc):
 dane = wczytaj_plik('data4.txt') #Wczytaj dane
 Cmax_var, Kolejnosc = Wyzarzanie(dane)
 print(Cmax_var)
+Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+print('NEH', Cmax_NEH)
 dane = wczytaj_plik('data16.txt')
 Cmax_var, Kolejnosc = Wyzarzanie(dane)
 print(Cmax_var)
+Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+print('NEH', Cmax_NEH)
 dane = wczytaj_plik('data25.txt')
 Cmax_var, Kolejnosc = Wyzarzanie(dane)
 print(Cmax_var)
+Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+print('NEH', Cmax_NEH)
 dane = wczytaj_plik('data31.txt')
 Cmax_var, Kolejnosc = Wyzarzanie(dane)
 print(Cmax_var)
+Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+print('NEH', Cmax_NEH)
 dane = wczytaj_plik('data43.txt')
 Cmax_var, Kolejnosc = Wyzarzanie(dane)
 print(Cmax_var)
+Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+print('NEH', Cmax_NEH)
 dane = wczytaj_plik('data54.txt')
 Cmax_var, Kolejnosc = Wyzarzanie(dane)
 print(Cmax_var)
+Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+print('NEH', Cmax_NEH)
 dane = wczytaj_plik('data63.txt')
 Cmax_var, Kolejnosc = Wyzarzanie(dane)
 print(Cmax_var)
+Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+print('NEH', Cmax_NEH)
 dane = wczytaj_plik('data72.txt')
 Cmax_var, Kolejnosc = Wyzarzanie(dane)
 print(Cmax_var)
+Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+print('NEH', Cmax_NEH)
 dane = wczytaj_plik('data81.txt')
 Cmax_var, Kolejnosc = Wyzarzanie(dane)
 print(Cmax_var)
+Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+print('NEH', Cmax_NEH)
 dane = wczytaj_plik('data93.txt')
 Cmax_var, Kolejnosc = Wyzarzanie(dane)
 print(Cmax_var)
+Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+print('NEH', Cmax_NEH)
 dane = wczytaj_plik('data105.txt')
 Cmax_var, Kolejnosc = Wyzarzanie(dane)
 print(Cmax_var)
+Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+print('NEH', Cmax_NEH)
