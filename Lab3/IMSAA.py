@@ -5,11 +5,11 @@ import math
 
 def Wyzarzanie (Maszyny):
     #inicjalizacja
-    T0=300 #Temp. poczatkowa
+    T0=200 #Temp. poczatkowa
     Tf=1 #Temp. koncowa
-    npmax=120 #liczba perturbacji w ramach 1 iteracji
+    npmax=165 #liczba perturbacji w ramach 1 iteracji
 
-    alfa = 0.95 #wspolczynnik chlodzenia
+    alfa = 0.99 #wspolczynnik chlodzenia
     # mi = 0.95
     # mi = 0.9
     # mi = 0.8
@@ -23,6 +23,8 @@ def Wyzarzanie (Maszyny):
         Kolejnosc.insert(random.randrange(len(Kolejnosc)), i+1)
     C = Cmax(Maszyny, Kolejnosc)
 
+    epsilon, Kolejnosc_NEH = qNEH(Maszyny)
+
     T=T0
 
     while T > Tf: #Temperature cycle
@@ -32,6 +34,12 @@ def Wyzarzanie (Maszyny):
 
             #Potencjalny ruch
             Cprim = Cmax(Maszyny, Kolejnosc_prim)
+
+            #if Cprim < epsilon:
+            #    C = Cprim
+            #    Kolejnosc = Kolejnosc_prim[:]
+            #    epsilon = Cprim
+            #    break
 
             deltaf = Cprim-C #roznica
 
@@ -72,58 +80,60 @@ def Insert(Kolejnosc):
     tmp.insert(wsadz_zadanie, nr_zadania)
     return tmp
 
-dane = wczytaj_plik('data4.txt') #Wczytaj dane
-Cmax_var, Kolejnosc = Wyzarzanie(dane)
-print(Cmax_var)
-Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
-print('NEH', Cmax_NEH)
-dane = wczytaj_plik('data16.txt')
-Cmax_var, Kolejnosc = Wyzarzanie(dane)
-print(Cmax_var)
-Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
-print('NEH', Cmax_NEH)
-dane = wczytaj_plik('data25.txt')
-Cmax_var, Kolejnosc = Wyzarzanie(dane)
-print(Cmax_var)
-Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
-print('NEH', Cmax_NEH)
-dane = wczytaj_plik('data31.txt')
-Cmax_var, Kolejnosc = Wyzarzanie(dane)
-print(Cmax_var)
-Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
-print('NEH', Cmax_NEH)
-dane = wczytaj_plik('data43.txt')
-Cmax_var, Kolejnosc = Wyzarzanie(dane)
-print(Cmax_var)
-Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
-print('NEH', Cmax_NEH)
-dane = wczytaj_plik('data54.txt')
-Cmax_var, Kolejnosc = Wyzarzanie(dane)
-print(Cmax_var)
-Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
-print('NEH', Cmax_NEH)
-dane = wczytaj_plik('data63.txt')
-Cmax_var, Kolejnosc = Wyzarzanie(dane)
-print(Cmax_var)
-Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
-print('NEH', Cmax_NEH)
-dane = wczytaj_plik('data72.txt')
-Cmax_var, Kolejnosc = Wyzarzanie(dane)
-print(Cmax_var)
-Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
-print('NEH', Cmax_NEH)
-dane = wczytaj_plik('data81.txt')
-Cmax_var, Kolejnosc = Wyzarzanie(dane)
-print(Cmax_var)
-Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
-print('NEH', Cmax_NEH)
-dane = wczytaj_plik('data93.txt')
-Cmax_var, Kolejnosc = Wyzarzanie(dane)
-print(Cmax_var)
-Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
-print('NEH', Cmax_NEH)
-dane = wczytaj_plik('data105.txt')
-Cmax_var, Kolejnosc = Wyzarzanie(dane)
-print(Cmax_var)
-Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
-print('NEH', Cmax_NEH)
+for i in range(5):
+    print("i = ", i)
+    dane = wczytaj_plik('data4.txt') #Wczytaj dane
+    Cmax_var, Kolejnosc = Wyzarzanie(dane)
+    print(Cmax_var)
+    Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+    print('NEH', Cmax_NEH)
+    dane = wczytaj_plik('data16.txt')
+    Cmax_var, Kolejnosc = Wyzarzanie(dane)
+    print(Cmax_var)
+    Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+    print('NEH', Cmax_NEH)
+    dane = wczytaj_plik('data25.txt')
+    Cmax_var, Kolejnosc = Wyzarzanie(dane)
+    print(Cmax_var)
+    Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+    print('NEH', Cmax_NEH)
+    dane = wczytaj_plik('data31.txt')
+    Cmax_var, Kolejnosc = Wyzarzanie(dane)
+    print(Cmax_var)
+    Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+    print('NEH', Cmax_NEH)
+    dane = wczytaj_plik('data43.txt')
+    Cmax_var, Kolejnosc = Wyzarzanie(dane)
+    print(Cmax_var)
+    Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+    print('NEH', Cmax_NEH)
+    dane = wczytaj_plik('data54.txt')
+    Cmax_var, Kolejnosc = Wyzarzanie(dane)
+    print(Cmax_var)
+    Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+    print('NEH', Cmax_NEH)
+    dane = wczytaj_plik('data63.txt')
+    Cmax_var, Kolejnosc = Wyzarzanie(dane)
+    print(Cmax_var)
+    Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+    print('NEH', Cmax_NEH)
+    dane = wczytaj_plik('data72.txt')
+    Cmax_var, Kolejnosc = Wyzarzanie(dane)
+    print(Cmax_var)
+    Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+    print('NEH', Cmax_NEH)
+    dane = wczytaj_plik('data81.txt')
+    Cmax_var, Kolejnosc = Wyzarzanie(dane)
+    print(Cmax_var)
+    Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+    print('NEH', Cmax_NEH)
+    dane = wczytaj_plik('data93.txt')
+    Cmax_var, Kolejnosc = Wyzarzanie(dane)
+    print(Cmax_var)
+    Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+    print('NEH', Cmax_NEH)
+    dane = wczytaj_plik('data105.txt')
+    Cmax_var, Kolejnosc = Wyzarzanie(dane)
+    print(Cmax_var)
+    Cmax_NEH, Kolejnosc_NEH = qNEH(dane)
+    print('NEH', Cmax_NEH)
