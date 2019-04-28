@@ -34,7 +34,7 @@ def schrage(dane):
         else:
             h = G.index(max(G, key=operator.itemgetter(2))) #wybor max dostarczenia
             e = G.pop(h)
-            e.append(t)  # dodanie chwili rozpoczecia jako [3] elementu w e.
+            #e.append(t)  # dodanie chwili rozpoczecia jako [3] elementu w e.
             t = t + e[1]
             Cmax = max(Cmax, t + e[2])
             O.append(e)
@@ -92,7 +92,7 @@ def schrage_kopiec(dane):
             t = N.korzen()[0]
         else:
             e = G.remove()
-            e.append(t)  # dodanie chwili rozpoczecia jako [3] elementu w e.
+            #e.append(t)  # dodanie chwili rozpoczecia jako [3] elementu w e.
             t = t + e[1]
             Cmax = max(Cmax, t + e[2])
             O.append(e)
