@@ -17,10 +17,11 @@ def MinimalJobshopSat(jobs_data):
     #    [(1, 4), (2, 3)]  # Job2
     #]
 
+    #liczba maszyn
     machines_count = 1 + max(task[0] for job in jobs_data for task in job)
     all_machines = range(machines_count)
 
-    # Computes horizon dynamically as the sum of all durations.
+    #Maksymalny czas trwania jako suma wszystkich czasów wykonywania
     horizon = sum(task[1] for job in jobs_data for task in job)
 
     # Named tuple to store information about created variables.
@@ -29,14 +30,14 @@ def MinimalJobshopSat(jobs_data):
     assigned_task_type = collections.namedtuple('assigned_task_type',
                                                 'start job index duration')
 
-    # Creates job intervals and add to the corresponding machine lists.
+    #Stworzenie intrwałów pracy i dodanie ich na odpowiednie maszyny
     all_tasks = {}
     machine_to_intervals = collections.defaultdict(list)
 
     for job_id, job in enumerate(jobs_data):
         for task_id, task in enumerate(job):
-            machine = task[0]
-            duration = task[1]
+            machine = task[0] #nr maszyny
+            duration = task[1] #czas trwania
             suffix = '_%i_%i' % (job_id, task_id)
             start_var = model.NewIntVar(0, horizon, 'start' + suffix)
             end_var = model.NewIntVar(0, horizon, 'end' + suffix)
@@ -46,30 +47,30 @@ def MinimalJobshopSat(jobs_data):
                 start=start_var, end=end_var, interval=interval_var)
             machine_to_intervals[machine].append(interval_var)
 
-    # Create and add disjunctive constraints.
+    #  Dodanie ograniczenia o nieprzerywaniu interwału na wszystkich maszynach
     for machine in all_machines:
         model.AddNoOverlap(machine_to_intervals[machine])
 
-    # Precedences inside a job.
+    # Rozpoczęcie kolejnej operacji w ramach tego samego zadania może rozpocząć się dopiero po zakończeniu się poprzedniej operacji
     for job_id, job in enumerate(jobs_data):
         for task_id in range(len(job) - 1):
             model.Add(all_tasks[job_id, task_id +
                                 1].start >= all_tasks[job_id, task_id].end)
 
-    # Makespan objective.
+    # Cmax jako funkcja kryterialna
     obj_var = model.NewIntVar(0, horizon, 'makespan')
-    model.AddMaxEquality(obj_var, [
+    model.AddMaxEquality(obj_var, [ #Wybierz ostani czas zakonczenia ze wszystkich maszyn
         all_tasks[job_id, len(job) - 1].end
         for job_id, job in enumerate(jobs_data)
     ])
-    model.Minimize(obj_var)
+    model.Minimize(obj_var) #Minimalizuj Cmax
 
     # Solve model.
     solver = cp_model.CpSolver()
     status = solver.Solve(model)
 
-    if status == cp_model.OPTIMAL:
-        # Create one list of assigned tasks per machine.
+    if status == cp_model.OPTIMAL: #Jeśli rozwiązanie optymalne -> wypisz schemat rozwiązania
+        # Lista zadań w obrębie jednej maszyny
         assigned_jobs = collections.defaultdict(list)
         for job_id, job in enumerate(jobs_data):
             for task_id, task in enumerate(job):
@@ -81,7 +82,7 @@ def MinimalJobshopSat(jobs_data):
                         index=task_id,
                         duration=task[1]))
 
-        # Create per machine output lines.
+        # Wypisanie zadań dla 1 maszyny
         output = ''
         for machine in all_machines:
             # Sort by starting time.
@@ -105,7 +106,7 @@ def MinimalJobshopSat(jobs_data):
             output += sol_line_tasks
             output += sol_line
 
-        # Finally print the solution found.
+        # Rozwiązanie optymalne - wypisz
         print('Optimal Schedule Length: %i' % solver.ObjectiveValue())
         print(output)
 
@@ -140,7 +141,7 @@ def GetINSAdataFromFile(filePath):
 #MinimalJobshopSat()
 
 if __name__ == '__main__':
-    file_paths = ["insa.txt"]
+    file_paths = ["jobshop.txt"]
 
     for i in range(len(file_paths)):
         jobs = GetINSAdataFromFile(file_paths[i])
