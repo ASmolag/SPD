@@ -16,7 +16,8 @@ def Cp(jobs, instnaceName):
     for i in range(len(jobs)):
         czas_pracy += jobs[i].p
     for i in range(len(jobs)):
-        variablesMaxValue += jobs[i].w*(czas_pracy-jobs[i].d)
+        if(czas_pracy-jobs[i].d>0):
+            variablesMaxValue += jobs[i].w*(czas_pracy-jobs[i].d)
 
 
     solver = cp_model.CpSolver()
@@ -28,18 +29,18 @@ def Cp(jobs, instnaceName):
 
     starts = []
     ends = []
+    delays = []
     for i in range(len(jobs)):
         starts.append(model.NewIntVar(0,variablesMaxValue,"starts"+str(i)))
         ends.append(model.NewIntVar(0, variablesMaxValue, "ends" + str(i)))
+        delays.append(model.NewIntVar(0,variablesMaxValue,"delays"+str(i)))
 
     WiTi = model.NewIntVar(0,variablesMaxValue,"witi")
 
-    suma = 0
+
     for i in range(len(jobs)):
         model.Add(ends[i]>=starts[i]+jobs[i].p)
-        model.Add(ends[i]>=jobs[i].d) #Jesli zadanie konczy sie w dopuszczalnym czasie, to zerujemy jego skladnik
-        model.Add(WiTi>=jobs[i].w*(ends[i]-jobs[i].d)+suma)
-        suma += jobs[i].w*(ends[i]-jobs[i].d) #Zapamietujemy cala sume wiTi
+        model.Add(delays[i]==jobs[i].w*(ends[i]-jobs[i].d))
 
     for i in range(len(jobs)):
         for j in range(i+1,len(jobs)):
@@ -47,6 +48,8 @@ def Cp(jobs, instnaceName):
             model.Add(starts[j]+jobs[j].p <= starts[i] + alfasMatrix[j,i]*variablesMaxValue)
             model.Add(alfasMatrix[i,j]+alfasMatrix[j,i]==1)
 
+    for i in range(len(delays)):
+        WiTi+=delays[i]
 
     model.Minimize(WiTi)
     status = solver.Solve(model)
